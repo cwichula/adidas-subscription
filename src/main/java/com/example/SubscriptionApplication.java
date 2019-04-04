@@ -1,12 +1,12 @@
-package com.infosys.ceh;
+package com.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CehApplication {
+public class SubscriptionApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CehApplication.class, args);
+        SpringApplication.run(SubscriptionApplication.class, args);
     }
 }

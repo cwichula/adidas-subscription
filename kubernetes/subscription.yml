@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscription-deploy
+  labels:
+    app: subscription-deploy
+spec:
+  selector:
+    matchLabels:
+      app: subscription
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: subscription
+    spec:
+      containers:
+        - name: subscription
+          image: infosys/subscription:0.0.1-SNAPSHOT
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_SERVER_ADDRESS
+              value: "kafka-service123:9092"
+            - name: KAFKA_TOPIC
+              value: "test"
+            - name: KAFKA_ENABLE_SSL
+              value: "false"
+
+          imagePullPolicy: Never
