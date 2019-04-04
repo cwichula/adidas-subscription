@@ -1,0 +1,5 @@
+KAFKA_ADDRESS=localhost:9092
+KAFKA_TOPIC_NAME=mail-topic
+MYSQL_ADDRESS=jdbc:mysql://localhost:3306/subscriptions
+MYSQL_ACCOUNT_USERNAME=root
+MYSQL_ACCOUNT_PASSWORD=password
