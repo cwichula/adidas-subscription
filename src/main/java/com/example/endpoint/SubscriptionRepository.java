@@ -7,5 +7,5 @@ import javax.transaction.Transactional;
 
 @Transactional
 @Repository
-public interface SubscriptionRepository extends CrudRepository<SubscriptionEntity, Long> {
+interface SubscriptionRepository extends CrudRepository<SubscriptionEntity, Long> {
 }

@@ -12,23 +12,23 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 class SubscriptionService {
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
-    private KafkaTemplate<String, SubscriptionEntity> kafkaTemplate;
+    private KafkaTemplate<String, SubscriptionDTO> kafkaTemplate;
     private KafkaProperties kafkaProperties;
     private SubscriptionRepository subscriptionRepository;
 
     public Long publish(SubscriptionDTO subscriptionDTO) {
         final SubscriptionEntity saved = saveToDatabase(subscriptionDTO);
         logger.info("Subscription entity saved: {}", saved);
-        sendToKafka(saved);
+        sendToKafka(subscriptionDTO);
         return saved.getId();
     }
 
-    private void sendToKafka(final SubscriptionEntity subscriptionEntity) {
-        final ListenableFuture<SendResult<String, SubscriptionEntity>> futureResponse = kafkaTemplate.send(
+    private void sendToKafka(final SubscriptionDTO subscription) {
+        final ListenableFuture<SendResult<String, SubscriptionDTO>> futureResponse = kafkaTemplate.send(
                 kafkaProperties.getKafkaTopicName(),
-                subscriptionEntity);
+                subscription);
 
-        futureResponse.addCallback(new ListenableFutureCallback<SendResult<String, SubscriptionEntity>>() {
+        futureResponse.addCallback(new ListenableFutureCallback<SendResult<String, SubscriptionDTO>>() {
             @Override
             public void onFailure(Throwable ex) {
                 logger.error("Failed kafka response", ex);
@@ -36,7 +36,7 @@ class SubscriptionService {
             }
 
             @Override
-            public void onSuccess(SendResult<String, SubscriptionEntity> result) {
+            public void onSuccess(SendResult<String, SubscriptionDTO> result) {
                 logger.info(String.format("TOPIC: %s; Producer record: %s Record metadata: %s",
                         kafkaProperties.getKafkaTopicName(),
                         result.getProducerRecord(),

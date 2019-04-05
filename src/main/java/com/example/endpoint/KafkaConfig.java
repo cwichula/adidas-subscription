@@ -18,7 +18,7 @@ import java.util.Map;
 class KafkaConfig {
 
     @Bean
-    public ProducerFactory<String, SubscriptionEntity> producerFactory(final KafkaProperties kafkaProperties) {
+    public ProducerFactory<String, SubscriptionDTO> producerFactory(final KafkaProperties kafkaProperties) {
         final Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getKafkaAddress());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,7 +29,7 @@ class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, SubscriptionEntity> kafkaTemplate(final ProducerFactory<String, SubscriptionEntity> producerFactory) {
+    public KafkaTemplate<String, SubscriptionDTO> kafkaTemplate(final ProducerFactory<String, SubscriptionDTO> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
