@@ -25,12 +25,13 @@ spec:
             - name: KAFKA_TOPIC_NAME
               value: "mail-topic"
             - name: MYSQL_ADDRESS
-              value: "jdbc:mysql://mysql:3306/subscriptions"
+              value: "jdbc:mysql://mysql:3306/subscriptions?createDatabaseIfNotExist=true"
             - name: MYSQL_ACCOUNT_USERNAME
               value: "root"
             - name: MYSQL_ACCOUNT_PASSWORD
               value: "password"
           imagePullPolicy: Never
+      restartPolicy: Always
 ---
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler

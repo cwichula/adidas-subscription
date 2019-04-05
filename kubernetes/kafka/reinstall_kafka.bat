@@ -11,4 +11,4 @@ kubectl create -f kafka-cluster.yml
 kubectl create -f kafka-service.yml
 
 
-pause
+
