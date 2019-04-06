@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-class SubscriptionController {
+public class SubscriptionController {
 
     private static final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
@@ -30,16 +30,20 @@ class SubscriptionController {
     @ExceptionHandler({Exception.class})
     ResponseEntity<SubscriptionResponse> unexpectedException(Exception e) {
         logger.error("Exception: ", e);
-        return new ResponseEntity<>(new SubscriptionResponse("Unexpected error, check more info in log file"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new SubscriptionResponse("Unexpected error, check more info in log file"),
+                                    HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping(path = "/subscription", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<SubscriptionResponse> createSubscription(@RequestBody @Valid SubscriptionRequest subscriptionRequest, BindingResult bindingResult) {
+    public ResponseEntity<SubscriptionResponse> createSubscription(@RequestBody @Valid SubscriptionRequest subscriptionRequest,
+                                                            BindingResult bindingResult) {
         logger.info(String.format("HTTP Request body: %s", subscriptionRequest));
         if (bindingResult.hasErrors()) {
             final List<ObjectError> allErrors = bindingResult.getAllErrors();
-            final List<String> messages = allErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
+            final List<String> messages = allErrors.stream()
+                                                   .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                                                   .collect(Collectors.toList());
             return new ResponseEntity<>(new SubscriptionResponse(String.join(", ", messages)), HttpStatus.BAD_REQUEST);
         }
         Long subscriptionId = subscriptionService.publish(subscriptionRequest);

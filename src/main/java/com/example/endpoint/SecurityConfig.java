@@ -12,20 +12,25 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests().anyRequest().authenticated()
-                .and()
-                .httpBasic()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf()
+            .disable()
+            .authorizeRequests()
+            .anyRequest()
+            .authenticated()
+            .and()
+            .httpBasic()
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth)
             throws Exception {
-        auth.inMemoryAuthentication().withUser("admin").password("{noop}admin").roles("USER");
+        auth.inMemoryAuthentication()
+            .withUser("admin")
+            .password("{noop}admin")
+            .roles("USER");
 
     }
 }

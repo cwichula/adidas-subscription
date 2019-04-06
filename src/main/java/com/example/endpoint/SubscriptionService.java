@@ -38,15 +38,16 @@ class SubscriptionService {
             @Override
             public void onSuccess(SendResult<String, SubscriptionRequest> result) {
                 logger.info(String.format("TOPIC: %s; Producer record: %s Record metadata: %s",
-                        kafkaProperties.getKafkaTopicName(),
-                        result.getProducerRecord(),
-                        result.getRecordMetadata()));
+                                          kafkaProperties.getKafkaTopicName(),
+                                          result.getProducerRecord(),
+                                          result.getRecordMetadata()));
             }
         });
     }
 
     private SubscriptionEntity saveToDatabase(final SubscriptionRequest subscriptionRequest) {
-        final SubscriptionEntity subscriptionEntity = SubscriptionMapper.subscriptionDtoToSubscriptionEntity(subscriptionRequest);
+        final SubscriptionEntity subscriptionEntity = SubscriptionMapper.subscriptionDtoToSubscriptionEntity(
+                subscriptionRequest);
         return subscriptionRepository.save(subscriptionEntity);
     }
 }
