@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 class SubscriptionConfig {
 
     @Bean
-    public SubscriptionService subscriptionService(final KafkaTemplate<String, SubscriptionDTO> kafkaTemplate,
+    public SubscriptionService subscriptionService(final KafkaTemplate<String, SubscriptionRequest> kafkaTemplate,
                                                    final KafkaProperties kafkaProperties,
                                                    final SubscriptionRepository subscriptionRepository) {
         return new SubscriptionService(

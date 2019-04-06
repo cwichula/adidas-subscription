@@ -35,14 +35,14 @@ class SubscriptionController {
 
     @PostMapping(path = "/subscription", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<SubscriptionResponse> eventPost(@RequestBody @Valid SubscriptionDTO subscriptionDTO, BindingResult bindingResult) {
-        logger.info(String.format("HTTP Request body: %s", subscriptionDTO));
+    ResponseEntity<SubscriptionResponse> createSubscription(@RequestBody @Valid SubscriptionRequest subscriptionRequest, BindingResult bindingResult) {
+        logger.info(String.format("HTTP Request body: %s", subscriptionRequest));
         if (bindingResult.hasErrors()) {
             final List<ObjectError> allErrors = bindingResult.getAllErrors();
             final List<String> messages = allErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
             return new ResponseEntity<>(new SubscriptionResponse(String.join(", ", messages)), HttpStatus.BAD_REQUEST);
         }
-        Long subscriptionId = subscriptionService.publish(subscriptionDTO);
+        Long subscriptionId = subscriptionService.publish(subscriptionRequest);
         return new ResponseEntity<>(new SubscriptionResponse(subscriptionId.toString()), HttpStatus.OK);
     }
 }

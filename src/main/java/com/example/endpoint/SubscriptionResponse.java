@@ -1,13 +1,13 @@
 package com.example.endpoint;
 
 class SubscriptionResponse {
-    private String response;
+    private String subscriptionId;
 
-    public SubscriptionResponse(String response) {
-        this.response = response;
+    public SubscriptionResponse(String subscriptionId) {
+        this.subscriptionId = subscriptionId;
     }
 
-    public String getResponse() {
-        return response;
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 }

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @NoArgsConstructor
 @ToString
-class SubscriptionDTO {
+class SubscriptionRequest {
 
     @Email
     @NotEmpty
@@ -31,12 +31,12 @@ class SubscriptionDTO {
     @NotEmpty
     private String isConsent;
 
-    SubscriptionDTO(@NotEmpty final String email,
-                    final String firstName,
-                    final String gender,
-                    @NotEmpty final String dateOfBith,
-                    @NotEmpty final String newsletterId,
-                    @NotEmpty final String isConsent) {
+    SubscriptionRequest(@NotEmpty final String email,
+                        final String firstName,
+                        final String gender,
+                        @NotEmpty final String dateOfBith,
+                        @NotEmpty final String newsletterId,
+                        @NotEmpty final String isConsent) {
         this.email = email;
         this.firstName = firstName;
         this.gender = gender;

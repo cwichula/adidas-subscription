@@ -12,23 +12,23 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 class SubscriptionService {
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
-    private KafkaTemplate<String, SubscriptionDTO> kafkaTemplate;
+    private KafkaTemplate<String, SubscriptionRequest> kafkaTemplate;
     private KafkaProperties kafkaProperties;
     private SubscriptionRepository subscriptionRepository;
 
-    public Long publish(SubscriptionDTO subscriptionDTO) {
-        final SubscriptionEntity saved = saveToDatabase(subscriptionDTO);
+    public Long publish(SubscriptionRequest subscriptionRequest) {
+        final SubscriptionEntity saved = saveToDatabase(subscriptionRequest);
         logger.info("Subscription entity saved: {}", saved);
-        sendToKafka(subscriptionDTO);
+        sendToKafka(subscriptionRequest);
         return saved.getId();
     }
 
-    private void sendToKafka(final SubscriptionDTO subscription) {
-        final ListenableFuture<SendResult<String, SubscriptionDTO>> futureResponse = kafkaTemplate.send(
+    private void sendToKafka(final SubscriptionRequest subscription) {
+        final ListenableFuture<SendResult<String, SubscriptionRequest>> futureResponse = kafkaTemplate.send(
                 kafkaProperties.getKafkaTopicName(),
                 subscription);
 
-        futureResponse.addCallback(new ListenableFutureCallback<SendResult<String, SubscriptionDTO>>() {
+        futureResponse.addCallback(new ListenableFutureCallback<SendResult<String, SubscriptionRequest>>() {
             @Override
             public void onFailure(Throwable ex) {
                 logger.error("Failed kafka response", ex);
@@ -36,7 +36,7 @@ class SubscriptionService {
             }
 
             @Override
-            public void onSuccess(SendResult<String, SubscriptionDTO> result) {
+            public void onSuccess(SendResult<String, SubscriptionRequest> result) {
                 logger.info(String.format("TOPIC: %s; Producer record: %s Record metadata: %s",
                         kafkaProperties.getKafkaTopicName(),
                         result.getProducerRecord(),
@@ -45,8 +45,8 @@ class SubscriptionService {
         });
     }
 
-    private SubscriptionEntity saveToDatabase(final SubscriptionDTO subscriptionDTO) {
-        final SubscriptionEntity subscriptionEntity = SubscriptionMapper.subscriptionDtoToSubscriptionEntity(subscriptionDTO);
+    private SubscriptionEntity saveToDatabase(final SubscriptionRequest subscriptionRequest) {
+        final SubscriptionEntity subscriptionEntity = SubscriptionMapper.subscriptionDtoToSubscriptionEntity(subscriptionRequest);
         return subscriptionRepository.save(subscriptionEntity);
     }
 }
