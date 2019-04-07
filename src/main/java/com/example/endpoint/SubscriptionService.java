@@ -9,7 +9,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @AllArgsConstructor
-class SubscriptionService {
+public class SubscriptionService {
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
 
     private KafkaTemplate<String, SubscriptionRequest> kafkaTemplate;
