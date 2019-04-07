@@ -28,7 +28,7 @@ Request HTTP POST for http://localhost:8081/subscription
 Body:
 
 {
-	"email":"cwichula@gmail.com",
+	"email":"your@email.address",
 	"dateOfBith":"30/08/2018",
 	"newsletterId":"someKampaign",
 	"isConsent":"true"
@@ -137,3 +137,7 @@ title: New Newsletter!
 message: Congratulations! You just subscribed to Adidas newsletter!
 
 The massage is example, it could be full HTML website.
+
+LIMITATIONS: 
+
+Google email server can send only 500 mails/day
