@@ -10,7 +10,9 @@ Java8 - current enterprise standard.
 
 Apache Kafka - is very scalable queue/streaming platform, using kafka for only 2 microservices maybe overkill byt taking look at feature a small project can become a monster... and kafka will handle that beast.
 
-Spring Boot - its lightweight version of popular spring framework, with some auto-configuration utilities. Its easy to bootstrap a fresh micro-app with this.MySQL - responsible for storing incoming data, generating unique id for each entry. Could scale in cloud, I choose this because i dont know other databases
+Spring Boot - its lightweight version of popular spring framework, with some auto-configuration utilities. Its easy to bootstrap a fresh micro-app with this. 
+
+MySQL - responsible for storing incoming data, generating unique id for each entry. Could scale in cloud, I choose this because i dont know other databases
 
 Spring Security Module - easy to integrate module for simple and more advanced authentication mechanism
 
