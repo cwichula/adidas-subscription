@@ -22,6 +22,8 @@ Lombok - very useful 3rd party java plugin for reducing Java boilerplate code, m
 
 Swagger - automatic documentation for the REST API
 
+
+
 The communication flow:
 
 1. 
