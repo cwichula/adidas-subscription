@@ -1,76 +1,24 @@
-local development setup:
+This is example software made in microservices architecture. 
 
-kubernetes minikube
-kafka on kubernetes
-mysql on kubernetes
+Used techs:
 
-1. setup kafka:
-    load zookeeper deployment and service
-    load kafka deployment and service
-2. setup mysql
-    load mysql storage config (1GB disc space)
-    load mysql server
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               5.6.43 - MySQL Community Server (GPL)
--- Server OS:                    Linux
--- HeidiSQL Version:             10.1.0.5464
--- --------------------------------------------------------
+Kubernetes - to connect and maintaind different software's, for ensuring 99.99% uptime, load balancing and whole cloud ecosystem. 
+Docker - to create OS independent environment for software to work.
+Java8 - current enterprise standard.
+Apache Kafka - is very scalable queue/streaming platform, using kafka for only 2 microservices maybe overkill byt taking look at feature a small project can become a monster... and kafka will handle that beast.
+Spring Boot - its lightweight version of popular spring framework, with some auto-configuration utilities. Its easy to bootstrap a fresh micro-app with this.MySQL - responsible for storing incoming data, generating unique id for each entry. Could scale in cloud, I choose this because i dont know other databases
+Spring Security Module - easy to integrate module for simple and more advanced authentication mechanism
+Spring Data JPA - easy to start with basic database query's, pre-made CRUD and other useful methods
+Lombok - very useful 3rd party java plugin for reducing Java boilerplate code, make source code more readable
+Swagger - automatic documentation for the REST API
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+The communication flow:
 
+1. 
 
--- Dumping database structure for subscriptions
-DROP DATABASE IF EXISTS `subscriptions`;
-CREATE DATABASE IF NOT EXISTS `subscriptions` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `subscriptions`;
+Request HTTP POST for http://localhost:8081/subscription
+Body:
 
--- Dumping structure for table subscriptions.subscriptions
-DROP TABLE IF EXISTS `subscriptions`;
-CREATE TABLE IF NOT EXISTS `subscriptions` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `email` varchar(50) NOT NULL,
-  `first_name` varchar(50) DEFAULT NULL,
-  `gender` varchar(50) DEFAULT NULL,
-  `date_of_bith` date NOT NULL,
-  `newsletter_id` varchar(50) NOT NULL,
-  `is_consent` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=343 DEFAULT CHARSET=latin1;
-
--- Data exporting was unselected.
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-
-
-    
-3. kafka should be ready at localhost:9092
-4. to work with mysql make a port-forward "kubectl port-forward name-of-the-pod 3306" - naw it available at localhost (root password)
-5. build docker image with maven
-6. load deployment subscription.yml to kubernetes
-7. load subscription-service.yml
-
-
-Example env variables are in env file or env-mail
-
-KAFKA_ADDRESS=localhost:9092
-KAFKA_TOPIC_NAME=mail-topic
-MYSQL_ADDRESS=jdbc:mysql://localhost:3306/subscriptions
-MYSQL_ACCOUNT_USERNAME=root
-MYSQL_ACCOUNT_PASSWORD=password
-
-now you this microservice will use mysql and kafka thru localhost address,
-and you can run, this locally by starting the main method or by maven
-mvnw spring-boot:run should start the service
-
-it expects REST at:
-
-POST http://localhost:8080/subscription
 {
 	"email":"cwichula@gmail.com",
 	"dateOfBith":"30/08/2018",
@@ -78,21 +26,106 @@ POST http://localhost:8080/subscription
 	"isConsent":"true"
 }
 
+Response: 
+{
+    "newsletterId": "123"
+}
+
+or empty if authentication credential are invalid
+
+2. Microservice that handle this Api will save this to database returns generated id and send it to the apache kafka topic.
+3. Mail microservice listen to the events on Apache Kafka topic and consume them by sending an email message to given email address.
+4. User receive on his mail the confirmation of the subscription to the newsletter
+
+How to run this?
+
+1. pre-requirements:
+- Kubernetes is installed locally
+- Docker is installed locally (localhost:2375 is exposed, see docker settings)
+- kubectl is connected to the cluster
+- %JAVA_HOME% environment variable is pointing to java installation
+- connection with insternet (to the docker registry)
+- git installed
+
+2. Automatic installation on windows:
+cmd:
+mkdir subscription
+git clone https://github.com/cwichula/adidas-subscription-challange.git
+git clone https://github.com/cwichula/adidas-subscription
+cd adidas-subscription
+reinstall_all.bat
+
+or Manual installation:
+
+Run maven in each git clone repository, it will build the project and create docker image locally:
+
+mvnw clean package dockerfile:build -DskipTests
+
+kubectl apply -f kubernetes\kafka\zookeeper.yml
+kubectl apply -f kubernetes\kafka\zookeeper-service.yml
+kubectl apply -f kubernetes\kafka\kafka-service.yml
+kubectl apply -f kubernetes\kafka\kafka-cluster.yml
+
+kubectl apply -f kubernetes\database\mysql-storage.yml
+kubectl apply -f kubernetes\database\mysql-deployment.yml
+kubectl apply -f kubernetes\database\mysql-service.yml
+
+kubectl apply -f kubernetes\subscription.yml
+kubectl apply -f kubernetes\subscription-service.yml
+
+
+kubectl apply -f ..\..\adidas-subscription-challange\kubernetes\mail-service.yml
+kubectl apply -f ..\..\adidas-subscription-challange\kubernetes\mail.yml
+
+Enviroment variables used by subscription-deployment:
+
+KAFKA_ADDRESS=localhost:9092
+KAFKA_TOPIC_NAME=mail-topic
+MYSQL_ADDRESS=jdbc:mysql://localhost:3306/subscriptions
+MYSQL_ACCOUNT_USERNAME=root
+MYSQL_ACCOUNT_PASSWORD=password
+
+Enviroment variables used by subscription-deployment:
+
+MAIL_SMTP_PORT=587
+MAIL_SMTP_HOST=smtp.gmail.com
+MAIL_ACCOUNT_USERNAME=no.replay.subscription@gmail.com
+MAIL_ACCOUNT_PASSWORD=pvhbnkdyhowfmiks
+MAIL_TRANSPORT_PROTOCOL=smtp
+MAIL_SMTP_AUTH_ENABLED=true
+MAIL_SMTP_STARTTLS_ENABLED=true
+MAIL_DEBUG_ENABLED=true
+MAIL_MESSAGE_TOPIC=New Newsletter!
+MAIL_MESSAGE_DESCRIPTION=Congratulations! You just subscribed to Adidas newsletter!
+KAFKA_ADDRESS=localhost:9092
+KAFKA_TOPIC_NAME=mail-topic
+KAFKA_LISTENER_GROUP_ID=mail-group-id
+
 Security:
+Only this endpoint (/subscription) will be visible on the public network, rest will be behind internal kubernetes network so it is considered to be safe.
 
-only this endpoint will be visible on the kubernetes, res will be behind internal network so it should be secure enought.
+To improve security this endpoint should be https, and kafka, mysql also should use ssl encryption if possible
 
-Toimprove security this should by https, and kafka, mysql also should use ssl
+Kubernetes general end-to-end test:
 
-Kubernetes general test:
+1. send POST HTTP http://localhost:8081/subscription
+with body: 
 
-API: 
-POST http://localhost:8081/subscription
-on master branch the yml configurations are tuned up for kubernetes internal usage,
+{
+	"email":"your@email.address",
+	"dateOfBith":"30/08/2018",
+	"newsletterId":"someKampaign",
+	"isConsent":"true"
+}
 
-example email account from gmail (500 mails/day)
+Expected response:
+{
+    "newsletterId":<NUMBER HERE>
+}
 
-mvn clean install dockerfile:build - to build docker image (needed to upload to kubernetes)
+Now check your mailbox, (or spam directory): there should be email 
+from no.replay.subscription@gmail.com
+title: New Newsletter!
+message: Congratulations! You just subscribed to Adidas newsletter!
 
-
-also if you have kubernetes on localhost you can use bat file local_deployment.bat
+The massage is example, it could be full HTML website.
